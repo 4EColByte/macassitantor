@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>登录--|-- 华卓MAC助手</title>
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon"/>
+    <link rel="stylesheet" href="/static/css/core.css" type="text/css" />
+    <link rel="stylesheet" href="/static/layui/css/layui.css" type="text/css" />
+</head>
+<body>
+<div  class="wrapper">
+    <div class="container">
+        <H1>欢迎使用Mac助手</H1>
+    <form class="layui-form form" name="login" οnsubmit="return check()"  action="/" method="post">
+        <div class="layui-form-item">
+        <label class="layui-form-label">用&#8194;户&#8194;名：</label>
+            <div class="layui-input-inline">
+                <input type="text" name="user" required  lay-verify="required" placeholder="请用户名" autocomplete="off" class="layui-input" >
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">用户密码：</label>
+            <div class="layui-input-inline">
+                <input type="password" name="password" required lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input">
+            </div>
+            <div class="layui-form-mid layui-word-aux">辅助文字&copy;</div>
+        </div>
+        <div class="layui-input-block">
+            <button type="submit" class="layui-btn layui-btn-radius" lay-submit=""  border-radius=""5px;>登&nbsp;&nbsp;&nbsp;&nbsp;录</button>
+        </div>
+    </div>
+    </form>
+    </div>
+    <ul class="bg-bubbles">
+		<li></li>
+		<li></li>
+		<li></li>
+		<li></li>
+		<li></li>
+		<li></li>
+		<li></li>
+		<li></li>
+		<li></li>
+		<li></li>
+	</ul>
+</div>
+<script type="text/javascript src=/static/layui/layui.all.js"></script>
+</body>
+</html>

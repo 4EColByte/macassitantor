@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>layout 后台大布局 - Layui</title>
+  <link rel="stylesheet" href="/static/layui/css/layui.css">
+    <style>
+    .layui-tab-content {
+        padding: 0;/*layui-tab-content:默认有padding: 10px;的值，因为iframe的绝对定位脱离文档流，所以会存在20px的空白空间*/
+    }
+
+    </style>
+</head>
+
+<body class="layui-layout-body">
+    <div class="layui-layout layui-layout-admin">
+        <div class="layui-header"></div>
+        <div class="layui-body show-frame">
+            <div lay-filter="demo" class="layui-tab layui-tab-card" lay-allowClose="true">
+                <ul class="layui-tab-title">
+                    <li class="layui-this">欢迎</li>
+                </ul>
+                <div class="layui-tab-content">
+                    <div class="layui-tab-item layui-show ">
+                        <iframe class='frame' frameborder="no" scrolling="no" src="departdetails/1"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="layui-footer"></div>
+    </div>
+</body>
+</body>
+<script src="/static/layui/layui.all.js"></script>
+<script>
+
+</script>
+</html>

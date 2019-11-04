@@ -1,0 +1,414 @@
+{% extends "iframebase.html" %}
+{% block body %}
+<div id="details">
+    <div>
+        <span><a onclick="departinfo(this); "href="javascript:;"  data-url="/departinfo/{{ dptid }}" class="layui-btn layui-btn-normal">部门详情</a></span>
+        <span><a onclick="addmember(this);" href="javascript:;" data-url="/addmember/{{ dptid }}"  class="layui-btn layui-btn-normal">添加部门成员</a></span>
+    </div>
+    <div class="layui-row" id="addmember" style="display: none">
+        <form class="layui-form" action="/addmember/{{ dptid }}" method="post" id="addMemberForm">
+            {% csrf_token %}
+            <div class="layui-form-item">
+                <label class="layui-form-label">{{ form.name.label }}</label>
+                <div class="layui-input-block">
+                    {{ form.name }}
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">{{ form.phone.label }}</label>
+                <div class="layui-input-block">
+                    {{ form.phone }}
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block" style="display: none;">
+                    <input type="hidden" name="departid" id="id_depart" value="{{ dptid }}">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">{{ form.comment.label }}</label>
+                <div class="layui-input-block">
+                    {{ form.comment }}
+                </div>
+            </div>
+        </form>
+    </div>
+    <div id="members" style="border: 1px solid #fff8c3;padding: 6px;  margin-top: 8px;">
+    </div>
+    <div id="pager" lay-filter="test"></div>
+    <script type="text/html" id="opbar">
+   		<a class="layui-btn layui-btn-mini" lay-event="edit">编辑</a>
+  		<a class="layui-btn layui-btn-danger layui-btn-mini" lay-event="del">删除</a>
+  	</script>
+</div>
+<script src="/static/layui/layui.all.js"></script>
+<script>
+    var $=layui.jquery;
+    var table=layui.table;
+    window.onload=function () {
+        var page=1, limit=2;
+        loadData(page, limit);  //请求数据
+
+    };
+    table.on('tool(test)', function(obj){
+	     var data = obj.data //获得当前行数据
+         , layEvent = obj.event;
+	     var ops={
+	         edit: function(e){
+	             var that = this;
+	             layer.open({
+                    type: 2 //此处以iframe举例
+                    , title: 'mac修改'
+                    , closeBtn: 0 // 是否显示关闭按钮
+                    , id: 'mac_update'
+                    , area: ['40%', '380px']
+                    , shade: 0
+                    , content: "/updatemac/"+ data.id
+                    , btn: ['保存', '取消']
+                    , yes: function() {
+                        layer.msg("11111111111111111111111111");
+                        $(that).click();
+                        $.ajax({
+                             type: "POST",
+                             url: "/updatemac/"+ data.id,
+                             data: "",
+                             success: function(rs){
+                                 if (rs.code == 0) {
+                                     layer.msg('修改成功');
+                                 }else{
+                                     layer.msg('修改失败');
+                                 };
+                            },
+                            error: function(){
+                                alert("请求失败");
+                                return false;
+                            }
+                        }); //ajax结束
+                    }
+                    , btn2: function() {
+                        layer.closeAll();
+                    }
+                    , zIndex: layer.zIndex //重点1
+                    , success: function(layero) {
+                        //layer.setTop(layero); //重点2
+                    }
+                 });
+             }
+	         ,del: function(obj){
+                  layer.alert('确定要删除该地址吗?', {
+                      closeBtn: 1 // 是否显示关闭按钮
+                      , anim: 1 //动画类型
+                      , btn: ['确定', '取消'] //按钮
+                      , icon: 6 // icon
+                      , yes: function(){
+                           $.ajax({
+                               type: "GET",
+                               url: "/delmac/"+ data.id,
+                               success: function(rs){
+                                   if (rs.code == 0) {
+                                       layer.msg('删除成功');
+                                       obj.del();
+                                   }else{
+                                       layer.msg(rs.msg)
+                                   };
+                               },
+                               error: function(){
+                                   alert("请求失败");
+                                   return false;
+                               }
+                           }); //ajax结束
+                      }
+                  });
+             }
+         };
+	     ops[layEvent] ? ops[layEvent].call(this, obj) : '';
+    });
+
+    function loadData(pg, lmt) {
+        var dptid = {{ dptid }};
+        $.ajax({
+	        type: "get",
+	        url: "/dptpages",//对应controller的URL
+	        async: true,
+	        dataType: 'json',
+	        data:{
+	            "pageIndex": pg,
+	            "pageSize": lmt,
+                "dptid": dptid  //需要js获取
+	        },
+	        success: function(ret){
+	            total=ret.total;  //设置总条数
+	            var data=ret.data;
+	            var html='';
+	            for(var i=0;i<data.length;i++){
+	                html+='<div style="border-radius: 4px; border: 2px dashed #f0eaea;padding: 8px;">' +
+                        '<table class="layui-table" id="mb-macs-' + i + '" lay-filter="mb-macs-' + i +'">\n' +
+                        '            <colgroup>\n' +
+                        '              <col width="360">\n' +
+                        '              <col width="360">\n' +
+                        '              <col >\n' +
+                        '            </colgroup>\n' +
+                        '            <tbody>\n' +
+                        '              <tr>\n' +
+                        '                <td>姓名：' + data[i].name + '</td><td>用户ID：';
+	                html+= data[i].id;
+	                html+='</td><td > <span style="padding: 2px;"><a href="javascript:;" class="layui-btn layui-btn-normal" data-event="edit" data-options="/updatemember/' + data[i].id + '" onclick="mmbop(this)">编辑</a></span>' +
+                        '<span style="padding: 2px;"><a href="javascript:;" class="layui-btn layui-btn-normal" data-event="del" data-options="/delmember/' + data[i].id + '" onclick="mmbop(this)">删除</a></span>' +
+                        '<span style="padding: 2px;"><a href="javascript:;" class="layui-btn layui-btn-mini" data-event="add" data-tableid="macs-' + i + '" data-options="/addmac/' + data[i].id + '" onclick="mmbop(this)">添加Mac</a><span>'  +
+                        '</td></tr></tbody> </table></div>';
+	                html +='<table class="layui-hide" id="macs-' + i + '" lay-filter="test"></table>';
+	            };
+	            $("#members").empty().append(html);
+	            for(var i=0;i<data.length;i++){
+	                table.render({
+                        elem: '#macs-' + i
+                        , id: '#macs-' + i
+                        , cols:  [[ //标题栏
+                            {checkbox: true}
+                            ,{field: 'mactype', title: '类型', width: 72, align: 'center'}
+                            ,{field: 'physic_mac', title: '物理地址', width: 150, align: 'center'}
+                            ,{field: 'fw_mac', title: '防火墙地址', width: 150, align: 'center'}
+                            ,{field: 'comment', title: '备注', align: 'left'}
+                            ,{field: '', title: '操作',  width: 180,toolbar: '#opbar', align: 'center'}
+                            ]]
+                        , url: '/macinfo/' + data[i].id
+                        , done: function(res, curr, count){
+                             if (count == 0){
+                                 console.log('没有请求到数据');
+                             };
+                        }
+                    });
+                };
+
+
+                layui.use('laypage', function(){
+                    var laypage = layui.laypage;
+                    //执行一个laypage实例
+                    laypage.render({
+                        elem: 'pager' //注意，这里的 test1 是 ID，不用加 # 号
+                        , curr: ret.page
+                        , count: ret.total //数据总数，从服务端得到
+                        , limit: ret.limit   //每页条数设置
+                        , limits: [2, 3, 5, 10]
+                        , groups: 3 //数据总数，从服务端得到
+                        , layout: ['prev',  'page', 'next', 'count', 'limit']
+                        ,theme: '#FF5722'
+                        , jump: function(obj, first){
+                            page=obj.curr;  //改变当前页码
+                            limit=obj.limit;
+                            //首次不执行
+                            if(!first){
+                                loadData(page, limit)  //加载数据
+                            };
+                        }
+                    });
+                });
+	        }
+        });
+    };
+
+    function mmbop(obj){
+        var $=layui.$;
+        var url = $(obj).data("options");
+        var ev=$(obj).data('event');
+        var tableid = $(obj).data(tableid);
+
+        var active = {
+            edit : function () {
+                var that = this;
+                //多窗口模式，层叠置顶
+                layer.open({
+                    type: 2 //此处以iframe举例
+                    , title: '成员修改'
+                     , closeBtn: 0 // 是否显示关闭按钮
+                    , id: 'member_update'
+                    , area: ['40%', '380px']
+                    , shade: 0
+                    , content: [url, "no"]
+                    , btn: ['保存', '取消']
+                    , yes: function () {
+                        $(that).click();
+                        $.ajax({
+                             type: "POST",
+                             url: url,
+                             data: tmp,
+                             success: function(rs){
+                                 if (rs.code == 0) {
+                                     layer.msg('删除成功');
+                                 }else{
+                                     layer.msg('删除失败')
+                                 };
+                            },
+                            error: function(){
+                                alert("请求失败");
+                                return false;
+                            }
+                        }); //ajax结束
+                    }
+                    , btn2: function () {
+                        layer.closeAll();
+                    }
+                    , zIndex: layer.zIndex //重点1
+                    , success: function (layero) {
+                        //layer.setTop(layero); //重点2
+                    }
+                });
+            }
+            , del: function () {
+                layer.alert('确定要删除该成员吗?', {
+                    skin: 'layui-layer-molv' //样式类名 自定义样式
+                    , closeBtn: 1 // 是否显示关闭按钮
+                    , anim: 1 //动画类型
+                    , btn: ['确定', '取消'] //按钮
+                    , icon: 6 // icon
+                    , yes: function(){
+                        $.ajax({
+                            type: "GET",
+                            url: url,
+                            success: function(rs){
+                                if (rs.code == 0) {
+                                    layer.msg('删除成功');
+                                }else{
+                                    layer.msg('删除失败')
+                                };
+                            },
+                            error: function(){
+                                alert("请求失败");
+                                return false;
+                            }
+                        }); //ajax结束
+                    }
+                });
+            }
+            , add: function () {
+                layer.open({
+                    type: 2
+                    , title: "添加Mac"
+                    , closeBtn: false
+                    , content: url
+                    , area: ['40%',"310px"]
+                    , btn: ["保存", "重置", "取消" ]
+                    , id: 'LAY_addmac' //设定一个id，防止重复弹出
+                    , btnAlign: 'c'
+                    , yes: function ( index, layero) {
+                         var body = layer.getChildFrame('body', index);
+                         var form = body.find("#addmac");
+                         var rqd = form.serialize()
+                         $.ajax({
+                             url: url
+                             , type: 'POST'
+                             ,data:   rqd
+                             , success: function (rs) {
+                                    if (rs.code == 0) {
+                                         layer.msg('添加成功');
+                                         console.log(tableid);
+                                         layer.close(index) ;
+                                    } else {
+                                        layer.msg('添加失败！');
+                                        return false;
+                                    }
+                                },
+                                error: function () {
+                                    layer.msg("请求失败！")
+                                    return false;
+                                }
+                         });
+                    }
+                    , btn2: function () {
+                        return false;
+                    }
+                })
+            }
+        };
+
+        active[ev] ? active[ev].call(this) : '';
+    };
+
+    function addmember(obj){
+        layui.use(['layer',], function(){
+            var layer = layui.layer, $ = layui.$;
+            layer.open({
+                type: 1
+                , title: "添加成员" //不显示标题栏
+                , closeBtn: false
+                , shift: 2
+                , shadeClose: true
+                , scrollbar: true
+                , area: ['50%', "372px"]
+                , shade: 0.8
+                , id: 'LAY_addmember' //设定一个id，防止重复弹出
+                , btn: ['保存', '重填', '取消']
+                , btnAlign: 'c'
+                , moveType: 1 //拖拽模式，0或者1
+                , content: $("#addmember")
+                , yes: function(index, layero){
+                    var url = $(obj).data('url');
+                    var tmp = $('#addMemberForm').serialize();
+                    $.ajax({
+                        url: url
+                        , type: 'POST'
+                        , data: tmp
+                        //, dataType: 'JSON',
+                        , success: function (rs) {
+                            if (rs.code == '200') {
+                                layer.msg('添加成功');
+                                //$('#addMemberForm')[0].reset();
+
+                                //table.reload(tableid,{data: data});
+                                layer.close(index);
+                            } else {
+                                layer.msg('添加失败！');
+                                return false;
+                            }
+                        },
+                        error: function () {
+                            layer.msg("test")
+                        }
+                    });
+                    return false;
+                }
+                , btn2: function(){
+                  //layer.msg("重置所有表单为空！");
+                  $('#addMemberForm')[0].reset();
+                  layui.form.render();
+                  return false;
+                }
+                , success: function(layero, index) {
+                    //var btn = layero.find('.layui-layer-btn');
+                    //btn.find('.layui-layer-btn0').attr({
+                    //    href: 'http://www.layui.com/'
+                    //    , target: '_blank'
+                    //});
+                    console.log(layero, index);
+                }
+            });
+        });
+    };
+
+    function departinfo(obj) {
+        layui.use(['layer',], function(){
+            var layer = layui.layer, $ = layui.$;
+            var url = $(obj).data('url');
+            layer.open({
+                type: 2
+                , title: "部门详情" //不显示标题栏
+                , closeBtn: false
+                , area: ['40%',"240px"]
+                , shade: 0.8
+                , id: 'LAY_departinfo' //设定一个id，防止重复弹出
+                , btn: ['确定']
+                , btnAlign: 'c'
+                , moveType: 1 //拖拽模式，0或者1
+                , content: [url, 'no' ]
+                ,time: 6000
+                , yes: function(index, layero){
+                    layer.close(index);
+                }
+            });
+        });
+    };
+</script>
+{% endblock %}
+
+
+

@@ -1,0 +1,54 @@
+<head>
+    <meta charset="UTF-8">
+    <title>departadd</title>
+    <link rel="stylesheet" href="/static/layui/css/layui.css" type="text/css" />
+</head>
+<div style="width: 60%;padding: 8px;margin: 16px;">
+    <form class="layui-form" method="post" action="/">
+{#    {% csrf_token %}#}
+{#    {{ form }}#}
+        <div class="layui-form-item">
+            <label class="layui-form-label">{{ form.name.label }}</label>
+            <div class="layui-input-inline">
+                {{ form.name }}
+            </div>
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">{{ form.level.label }}</label>
+            <div class="layui-input-block">
+              {{ form.level }}
+            </div>
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">{{ form.comments.label }}</label>
+            <div class="layui-input-block">
+                {{ form.comments }}
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="dptsave">保存</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+<script type="application/javascript" src="/static/layui/layui.all.js"></script>
+<script>
+   var $=layui.jquery;
+   var form=layui.form;
+   form.on('submit(dptsave)', function(data){
+       console.log(data);
+       $.ajax({
+           method: "post",
+           url: '/adddpt',
+           data: data.field,
+           success: function(data) {
+               if (data.code == 1) {
+                   layui.layer.msg("保存成功")
+               };
+           }
+       });
+    return false;
+  });
+</script>

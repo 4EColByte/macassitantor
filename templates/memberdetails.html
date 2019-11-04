@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+    <link rel="text/css" src="/static/layui/css/layui.css">
+</head>
+<body>
+<form method='post' action="">
+{% csrf_token %}
+{{ form }}
+<input type="submit" value="提交">
+<script src="/static/layui/layui.all.js"></script>
+<script>
+//由于模块都一次性加载，因此不用执行 layui.use() 来加载对应模块，直接使用即可：
+;!function(){
+  var layer = layui.layer
+  ,form = layui.form;
+
+  layer.msg('Hello World');
+}();
+</script>
+</body>
+</html>

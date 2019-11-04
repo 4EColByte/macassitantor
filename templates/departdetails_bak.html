@@ -1,0 +1,135 @@
+{% extends "iframebase.html" %}
+{% block body %}
+<div id="details">
+    <div>
+        <span><a href="/departinfo/{{ dptid }}"  class="layui-btn layui-btn-normal" target="_self">部门详情</a></span>
+        <span><a href="/addmember/{{ dptid }}"  class="layui-btn layui-btn-normal" target="_self">添加部门成员</a></span>
+    </div>
+    <div style="border: 1px solid red;padding: 6px;">
+        {% for key, values in macinfo.items %}
+        <div style="border-radius: 4px; border: 2px dashed #f0eaea;padding: 8px;">
+          <table class="layui-table" border="0">
+            <colgroup>
+              <col width="360">
+              <col width="360">
+              <col >
+            </colgroup>
+            <tbody>
+              <tr>
+                <td>姓名：{{ key.name }}</td>
+                <td>用户ID： {{ key.id }}</td>
+                <td> <span style="padding: 4px;"><a href="javascript:;" class="layui-btn layui-btn-normal" data-optoins="/editmember/{{ key.id }}">编辑</a></span><span><a href="javascript:;" class="layui-btn layui-btn-normal" data-optoins="/delmember/{{ key.id }}">删除</a></span></td>
+              </tr>
+            </tbody>
+          </table>
+        {% if values %}
+        <table class="layui-table">
+          <colgroup>
+            <col width="150">
+            <col width="200">
+            <col>
+          </colgroup>
+          <thead>
+            <tr>
+              <th>类型</th>
+              <th>物理地址</th>
+              <th>防火墙地址</th>
+              <th>备注</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for mac in values %}
+            <tr>
+              <td>{{ mac.get_mactype_display }}</td>
+              <td>{{ mac.physic_mac }}</td>
+              <td>{{ mac.fw_mac }}</td>
+              <td>{{ mac.comment }}</td>
+              <td><span style="padding: 4px;"><a href="javascript:;" class="layui-btn layui-btn-normal" data-optoins="/editmac/{{ mac.id }}/{{ key.id }}">编辑</a></span>
+                  <span><a href="javascript:;" class="layui-btn layui-btn-normal" data-optoins="/delmac/{{ mac.id }}/{{ key.id }}">删除</a></span></td>
+            </tr>
+           {% empty %}
+                 <p> 该用户下未登录mac地址</p>
+             {% endfor %}
+          </tbody>
+        </table>
+        {% endif %}
+        </div>
+        {% empty %}
+          <p>未取到用户</p>
+        {% endfor %}
+    </div>
+</div>
+<script src="/static/layui/layui.all.js"></script>
+<script>
+var  $ = layui.jquery;
+var active = {
+    setTop: function () {
+        var that = this;
+        //多窗口模式，层叠置顶
+        layer.open({
+            type: 2 //此处以iframe举例
+            , title: '部门详情'
+            , id: 'Depart_detail'
+            , area: ['390px', '260px']
+            , shade: 0
+            , maxmin: true
+            , offset: [ //为了演示，随机坐标
+                Math.random() * ($(window).height() - 300)
+                , Math.random() * ($(window).width() - 390)
+            ]
+            , content: '//layer.layui.com/test/settop.html'
+            , btn: ['继续弹出', '全部关闭'] //只是为了演示
+            , yes: function () {
+                $(that).click();
+            }
+            , btn2: function () {
+                layer.closeAll();
+            }
+
+            , zIndex: layer.zIndex //重点1
+            , success: function (layero) {
+                layer.setTop(layero); //重点2
+            }
+        });
+    }
+    , confirmTrans: function () {
+        //配置一个透明的询问框
+        layer.msg('大部分参数都是可以公用的<br>合理搭配，展示不一样的风格', {
+            time: 20000, //20s后自动关闭
+            btn: ['关闭',]
+        });
+    }
+    , notice: function () {
+        //示范一个公告层
+        layer.open({
+            type: 1
+            , title: false //不显示标题栏
+            , closeBtn: false
+            , area: '300px;'
+            , shade: 0.8
+            , id: 'LAY_layuipro' //设定一个id，防止重复弹出
+            , btn: ['火速围观', '残忍拒绝']
+            , btnAlign: 'c'
+            , moveType: 1 //拖拽模式，0或者1
+            , content: '<div style="padding: 50px; line-height: 22px; background-color: #393D49; color: #fff; font-weight: 300;">你知道吗？亲！<br>layer ≠ layui<br><br>layer只是作为Layui的一个弹层模块，由于其用户基数较大，所以常常会有人以为layui是layerui<br><br>layer虽然已被 Layui 收编为内置的弹层模块，但仍然会作为一个独立组件全力维护、升级。<br><br>我们此后的征途是星辰大海 ^_^</div>'
+            , success: function (layero) {
+                var btn = layero.find('.layui-layer-btn');
+                btn.find('.layui-layer-btn0').attr({
+                    href: 'http://www.layui.com/'
+                    , target: '_blank'
+                });
+            }
+        });
+    }
+};
+
+  {#  $('.layui-btn').on('click', function(){#}
+  {#  var othis = $(this), method = othis.data('method'), url=othis.data('options');#}
+  {#  active[method] ? active[method].call(this, othis) : '';#}
+  {#});#}
+</script>
+{% endblock %}
+
+
+

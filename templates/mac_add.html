@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block css %}                 {# block 是块代码 #}
+    <!--base.html的css-->
+    {{ block.super }}
+    <link rel="stylesheet" href="/static/layui/css/layui.css" type="text/css" />
+{% endblock %}
+{% block content %}
+    <form id="addmac" action="/addmac/1" method="post">
+        {% csrf_token %}
+        <div class="layui-form-item">
+                <label class="layui-form-label">{{ form.mactype.label }}</label>
+                <div class="layui-input-block">
+                    {{ form.mactype }}
+                </div>
+        </div>
+        <div class="layui-form-item">
+                <label class="layui-form-label">{{ form.phaddr.label }}</label>
+                <div class="layui-input-block">
+                    {{ form.phaddr }}
+                </div>
+        </div>
+        <div class="layui-form-item">
+                <label class="layui-form-label">{{ form.comment.label }}</label>
+                <div class="layui-input-block">
+                    {{ form.comment }}
+                </div>
+        </div>
+    </form>
+{% endblock %}

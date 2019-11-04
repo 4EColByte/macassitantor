@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>laypage - Layui</title>
+  <link rel="stylesheet" href="/static/layui/css/layui.css">
+</head>
+<body class="layui-layout-body">
+    <div class="layui-layout layui-layout-admin">
+        <div class="layui-header"></div>
+        <div class="orderList"></div>
+        <div id="pager"></div>
+        <div class="layui-footer">footer</div>
+    </div>
+<script src="/static/layui/layui.js"></script>
+<script>
+    var $=layui.jquery;
+    window.onload= function () {
+        console.log(window.location.host)
+        loadData()  //请求数据
+        getPage()     //分页操作
+    };
+    layui.use(['layer','form','laypage'],function() {
+        var form = layui.form;
+        var layer = layui.layer;
+        var $ = layui.jquery;
+        var laypage = layui.laypage;
+
+
+
+        laypage.render({
+            elem: 'page' //注意，这里的 test1 是 ID，不用加 # 号
+            ,count: 50 //数据总数，从服务端得到
+            ,limits: [10, 15, 20]
+            ,groups: 3
+            , curr: 1                        //起始页
+            , groups: 5                      //连续页码个数
+            , prev: '上一页'                 //上一页文本
+            , netx: '下一页'                 //下一页文本
+            , first: 1                      //首页文本
+            , last: 100                     //尾页文本
+            , layout: ['prev', 'page', 'next','limit','refresh','skip']
+            // ,jump: function (obj, first) {//触发分页后的回调
+            // if (!first) {//点击跳页触发函数自身，并传递当前页：obj.curr
+            //    GetNoticeList(obj.curr, cid);
+            //       }
+            //       }
+            // });
+	    });
+    });
+
+    function loadData(){
+        var page=1; //设置首页页码
+        var limit=2;  //设置一页显示的条数
+        var total;    //总条数
+        var $ = layui.jquery;
+	    $.ajax({
+	        type: "get",
+	        url:"/jsondata",//对应controller的URL
+	        async: true,
+	        dataType: 'json',
+	        data: {
+	            "pageIndex": page,
+	            "pageSize": limit,
+	        },
+	        success: function(ret){
+	            total = ret.count;  //设置总条数
+	            console.log(ret);
+	            var data1 = ret.rows;
+	            var data = ret.data;
+	            var html = '';
+	            for(var i=0;i< data.length;i++){
+	                html+='<dl>';
+	                html+=' <dt>';
+	                html+='     <span class="s1">'+data[i].name +'</span>';
+	                html+='     <span class="s2">'+data[i].name+'</span>';
+	                html+=' </dt>';
+	                html+=' <dd class="d1">';
+	                html+='     价格：<span>￥'+data[i].name+'</span>';
+	                html+=' </dd>';
+	                html+=' <dd class="d1">';
+	                html+='     名称：<span>'+data[i].name+'</span>';
+	                html+=' </dd>';
+	                html+=' <dd class="d1">';
+	                html+='     人数：<span>'+data[i].name+'人参与</span>';
+	                html+=' </dd>';
+	                html+=' <dd class="d1">';
+	                html+='     时间：<span>'+data[i].name+'点 -- '+data[i].name+'点</span>';
+	                html+=' </dd>';
+	                html+='</dl>';
+
+	            };
+	            $(".orderList").empty().append(html);
+	        }
+        });
+    };
+
+	function getPage(){
+	    layui.use('laypage', function(){
+	        var laypage = layui.laypage;
+
+	        //执行一个laypage实例
+	        laypage.render({
+	            elem: 'pager' //注意，这里的 test1 是 ID，不用加 # 号
+	            , count: 50 //数据总数，从服务端得到
+	            , limit: 10  //每页条数设置
+                , limits: [10, 20, 30]
+                , layout: ['prev', 'page', 'next','limit','refresh','skip']
+	            , jump: function(obj, first){
+	                //obj包含了当前分页的所有参数，比如：
+	                console.log(obj); //得到当前页，以便向服务端请求对应页的数据。
+	                page=obj.curr;  //改变当前页码
+	                limit=obj.limit;
+	                //首次不执行
+	                if(!first){
+	                    loadData()  //加载数据
+	                };
+	            }
+	        });
+	    });
+	};
+</script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+{% extends "iframebase.html" %}
+{% block body %}
+<div id="detail">
+<table class="layui-table" border="0">
+            <colgroup>
+              <col width="60">
+              <col width="100">
+            </colgroup>
+            <tbody>
+              <tr> <td>部门名称</td>  <td>{{ depart.name }}</td>  </tr>
+              <tr> <td>部门级别</td>  <td>{{ depart.get_level_display }}</td>  </tr>
+              <tr> <td>上级部门</td>  <td>{% if not depart.parent %} 无 {% else %} {{ depart.parent }} {% endif %}</td>  </tr>
+              <tr> <td>部门备注</td>  <td>{{ depart.comments }}</td>  </tr>
+            </tbody>
+          </table>
+</div>
+<script src="/static/layui/layui.all.js"></script>
+{% endblock %}
+
+
+
