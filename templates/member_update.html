@@ -19,10 +19,12 @@
                     {{ form.phone }}
                 </div>
             </div>
-            <div class="layui-form-item">
-                <div class="layui-input-block" style="display: none;">
-                    <input type="hidden" name="departid" id="id_depart" value="{{ dptid }}">
+            <div class="layui-form-item" style="display: none;">
+                <label class="layui-form-label">{{ form.departid.label }}</label>
+                <div class="layui-input-block">
+                    {{ form.departid }}
                 </div>
+            </div>
             </div>
             <div class="layui-form-item">
                 <label class="layui-form-label">{{ form.comment.label }}</label>

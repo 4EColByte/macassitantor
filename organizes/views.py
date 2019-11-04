@@ -152,6 +152,7 @@ def updatemember(request, mmb_id):
         form.fields['name'].initial = member.name
         form.fields['phone'].initial = member.phone
         form.fields['comment'].initial = member.comment
+        form.fields['departid'].initial = member._get_pk_val
         return render(request, "member_update.html", {'form': form, 'member': mmb_id})
     elif request.method == "POST":
         form = MemberForm(request.POST)
@@ -165,10 +166,6 @@ def updatemember(request, mmb_id):
             member.comment = comment
             member.save()
             return JsonResponse({'code': 0, 'msg': "修改成功"})
-
-
-
-
     print('post data', mmb_id)
     rspdata = {'code': 0, 'msg': "删除成功"}
     return JsonResponse(rspdata)
@@ -217,19 +214,22 @@ def logout(request):
 
 
 def updatemac(request, mac_id):
-    form = PersonalMac()
     if request.method == "GET":
+        # form.fields['mactype'].widget.choices = MACTYPE_CHOICES
         mac_obj = MacAddr.objects.get(id=mac_id)
-        form.fields['mactype'].initial = mac_obj.mactype
+        # form = PersonalMac(initial={'mactype': [mac_obj.mactype,], 'phaddr': mac_obj.physic_mac, 'comment':  mac_obj.comment})
+        form = PersonalMac()
+        form.fields['mactype'].initial = [ mac_obj.mactype, ]
         form.fields['phaddr'].initial = mac_obj.physic_mac
         form.fields['comment'].initial = mac_obj.comment
         return render(request, "mac_update.html", {'form': form, 'mac_id': mac_id})
     elif request.method == "POST":
+        form = PersonalMac(request.POST)
         if form.is_valid():
             mactype = form.cleaned_data["mactype"]
             phaddr = form.cleaned_data["phaddr"]
             comment = form.cleaned_data["comment"]
-            member = Member.objects.get(id=mem_id)
+            member = MacAddr.objects.get(id=mac_id)
             mac_rs = MacAddr(member=member, mactype=mactype, phaddr=phaddr, comment=comment, fw_mac=macconvert(phaddr))
             mac_md.save();
             return JsonResponse({'code': 0, 'msg': "修改成功！", "status": 600})

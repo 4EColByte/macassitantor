@@ -65,13 +65,15 @@
                     , shade: 0
                     , content: "/updatemac/"+ data.id
                     , btn: ['保存', '取消']
-                    , yes: function() {
-                        layer.msg("11111111111111111111111111");
-                        $(that).click();
-                        $.ajax({
+                    , yes: function(index, layero) {
+                         var body = layer.getChildFrame('body', index);
+                         var form = body.find("#updatemac");
+                         var rqd = form.serialize()
+                         $(that).click();
+                         $.ajax({
                              type: "POST",
                              url: "/updatemac/"+ data.id,
-                             data: "",
+                             data: rqd,
                              success: function(rs){
                                  if (rs.code == 0) {
                                      layer.msg('修改成功');
@@ -226,17 +228,21 @@
                     , shade: 0
                     , content: [url, "no"]
                     , btn: ['保存', '取消']
-                    , yes: function () {
+                    , yes: function (index, layero) {
                         $(that).click();
+                         var body = layer.getChildFrame('body', index);
+                         var form = body.find("#updateMemberForm");
+                         var rqd = form.serialize()
                         $.ajax({
                              type: "POST",
                              url: url,
-                             data: tmp,
+                             data: rqd,
                              success: function(rs){
                                  if (rs.code == 0) {
-                                     layer.msg('删除成功');
+                                     layer.msg('更新成功');
+                                     layer.close(index);
                                  }else{
-                                     layer.msg('删除失败')
+                                     layer.msg('更新失败')
                                  };
                             },
                             error: function(){
@@ -290,7 +296,7 @@
                     , btn: ["保存", "重置", "取消" ]
                     , id: 'LAY_addmac' //设定一个id，防止重复弹出
                     , btnAlign: 'c'
-                    , yes: function ( index, layero) {
+                    , yes: function (index, layero) {
                          var body = layer.getChildFrame('body', index);
                          var form = body.find("#addmac");
                          var rqd = form.serialize()

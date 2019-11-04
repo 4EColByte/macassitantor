@@ -6,7 +6,6 @@
     <title>{% block title%} base.html 的title{% endblock %}</title>
     <link rel="shortcut icon" href="/static/favicon.ico" type="image/x-icon" />
     <link rel="icon" type="image/x-icon" href="/static/favicon.ico" sizes="192x192" />
-    <link rel="stylesheet" href="/static/css/core.css" type="text/css" />
     <link rel="bookmark" href="/static/favicon.ico" type="image/x-icon" />
     {% block css %}                 {# block 是块代码 #}
         <!--base.html的css-->
@@ -17,6 +16,7 @@
             float: left;
         }
         </style>
+    <link rel="stylesheet" href="/static/css/core.css" type="text/css" />
     {% endblock %}
     {% block headjs %}
     {% endblock %}
