@@ -1,3 +1,7 @@
+# culstom file and directorys
+.idea/
+migrations/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
