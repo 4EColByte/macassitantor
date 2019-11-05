@@ -54,7 +54,7 @@
 	     var data = obj.data //获得当前行数据
          , layEvent = obj.event;
 	     var ops={
-	         edit: function(e){
+	         edit: function(obj){
 	             var that = this;
 	             layer.open({
                     type: 2 //此处以iframe举例
@@ -73,10 +73,11 @@
                          $.ajax({
                              type: "POST",
                              url: "/updatemac/"+ data.id,
-                             data: rqd,
+                             data: obj.data,
                              success: function(rs){
                                  if (rs.code == 0) {
                                      layer.msg('修改成功');
+                                     layer.close(index);
                                  }else{
                                      layer.msg('修改失败');
                                  };
@@ -164,7 +165,7 @@
 	            for(var i=0;i<data.length;i++){
 	                table.render({
                         elem: '#macs-' + i
-                        , id: '#macs-' + i
+                        , id: 'macs-' + i
                         , cols:  [[ //标题栏
                             {checkbox: true}
                             ,{field: 'mactype', title: '类型', width: 72, align: 'center'}
@@ -213,10 +214,9 @@
         var $=layui.$;
         var url = $(obj).data("options");
         var ev=$(obj).data('event');
-        var tableid = $(obj).data(tableid);
-
+        var tid = $(obj).data('tableid');
         var active = {
-            edit : function () {
+            edit : function ()  {
                 var that = this;
                 //多窗口模式，层叠置顶
                 layer.open({
@@ -286,7 +286,7 @@
                     }
                 });
             }
-            , add: function () {
+            , add: function (obj) {
                 layer.open({
                     type: 2
                     , title: "添加Mac"
@@ -307,7 +307,6 @@
                              , success: function (rs) {
                                     if (rs.code == 0) {
                                          layer.msg('添加成功');
-                                         console.log(tableid);
                                          layer.close(index) ;
                                     } else {
                                         layer.msg('添加失败！');
@@ -323,11 +322,19 @@
                     , btn2: function () {
                         return false;
                     }
+                    , end: function(){
+                        var arr = url.split('/');
+                        table.reload(tid, {
+                            where: {}
+                            , url: "/macinfo/" + arr[2]
+                            , method: "get"
+                        });
+                    }
                 })
             }
         };
 
-        active[ev] ? active[ev].call(this) : '';
+        active[ev] ? active[ev].call(this, tid, url) : '';
     };
 
     function addmember(obj){

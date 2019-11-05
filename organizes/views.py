@@ -229,9 +229,12 @@ def updatemac(request, mac_id):
             mactype = form.cleaned_data["mactype"]
             phaddr = form.cleaned_data["phaddr"]
             comment = form.cleaned_data["comment"]
-            member = MacAddr.objects.get(id=mac_id)
-            mac_rs = MacAddr(member=member, mactype=mactype, phaddr=phaddr, comment=comment, fw_mac=macconvert(phaddr))
-            mac_md.save();
+            mac_obj = MacAddr.objects.get(id=mac_id)
+            mac_obj.mactype = mactype
+            mac_obj.physic_mac = phaddr
+            mac_obj.comment = comment
+            mac_obj.fw_mac = macconvert(phaddr)
+            mac_obj.save();
             return JsonResponse({'code': 0, 'msg': "修改成功！", "status": 600})
         else:
             return JsonResponse({'code': 1, 'msg': "修改失败！，请检查系统！", "status": 601})
