@@ -31,6 +31,12 @@
                     {{ form.comment }}
                 </div>
             </div>
+            <div class="layui-form-item" style="display: none">
+                 <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit="" lay-filter="memberadd" id="memberadd"></button>
+                 </div>
+            </div>
+    </div>
         </form>
     </div>
     <div id="members" style="border: 1px solid #fff8c3;padding: 6px;  margin-top: 8px;">
@@ -45,6 +51,8 @@
 <script>
     var $=layui.jquery;
     var table=layui.table;
+    var form = layui.form;
+    var layer = layui.layer;
     window.onload=function () {
         var page=1, limit=2;
         loadData(page, limit);  //请求数据
@@ -73,11 +81,13 @@
                          $.ajax({
                              type: "POST",
                              url: "/updatemac/"+ data.id,
-                             data: obj.data,
+                             data: rqd,
                              success: function(rs){
                                  if (rs.code == 0) {
                                      layer.msg('修改成功');
                                      layer.close(index);
+                                     var  tblid = layui.$(obj.tr).parents('.layui-table-view').attr('lay-id');
+                                     table.reload(tblid);
                                  }else{
                                      layer.msg('修改失败');
                                  };
@@ -92,9 +102,9 @@
                         layer.closeAll();
                     }
                     , zIndex: layer.zIndex //重点1
-                    , success: function(layero) {
-                        //layer.setTop(layero); //重点2
-                    }
+                    , success: function(index, layero) {
+
+                     }
                  });
              }
 	         ,del: function(obj){
@@ -231,8 +241,9 @@
                     , yes: function (index, layero) {
                         $(that).click();
                          var body = layer.getChildFrame('body', index);
-                         var form = body.find("#updateMemberForm");
+                         var form = body.find("#updateMember");
                          var rqd = form.serialize()
+                         var ltid = tid;
                         $.ajax({
                              type: "POST",
                              url: url,
@@ -241,6 +252,12 @@
                                  if (rs.code == 0) {
                                      layer.msg('更新成功');
                                      layer.close(index);
+                                     var curpageelm = $("#pager").find("span.layui-laypage-curr").children();
+                                     var curpage = curpageelm[1].innerText;
+                                     var selectelm = $("#pager").find("span.layui-laypage-limits").children()[0];
+                                     var limts = $(selectelm).find("option:selected").val();
+                                     loadData(curpage, limts);
+
                                  }else{
                                      layer.msg('更新失败')
                                  };
@@ -256,7 +273,6 @@
                     }
                     , zIndex: layer.zIndex //重点1
                     , success: function (layero) {
-                        //layer.setTop(layero); //重点2
                     }
                 });
             }
@@ -274,8 +290,13 @@
                             success: function(rs){
                                 if (rs.code == 0) {
                                     layer.msg('删除成功');
+                                    var curpageelm = $("#pager").find("span.layui-laypage-curr").children();
+                                    var curpage = curpageelm[1].innerText;
+                                    var selectelm = $("#pager").find("span.layui-laypage-limits").children()[0];
+                                    var limts = $(selectelm).find("option:selected").val();
+                                    loadData(curpage, limts);
                                 }else{
-                                    layer.msg('删除失败')
+                                    layer.msg(rs.msg);
                                 };
                             },
                             error: function(){
@@ -355,6 +376,15 @@
                 , moveType: 1 //拖拽模式，0或者1
                 , content: $("#addmember")
                 , yes: function(index, layero){
+                    var submit=$("#memeberadd");
+                    var submitID = 'memberadd';
+                    form.on('submit('+ submitID +')', function(data){
+                          var field = data.field; //获取提交的字段
+                          console.log(submitID);
+                          //提交 Ajax 成功后，静态更新表格中的数据
+                          //$.ajax({});
+                        });
+                    submit.trigger('click');
                     var url = $(obj).data('url');
                     var tmp = $('#addMemberForm').serialize();
                     $.ajax({
@@ -369,6 +399,16 @@
 
                                 //table.reload(tableid,{data: data});
                                 layer.close(index);
+                                var selectelm = $("#pager").find("span.layui-laypage-limits").children()[0];
+                                var limits = $(selectelm).find("option:selected").val();
+                                var countselm = $("#pager").find("span.layui-laypage-count");
+                                var countsstr = countselm[0].innerText;
+                                var arrcouns = countsstr.split(' ');
+                                var counts =  arrcouns[1];
+                                var lastpage = Math.ceil(counts/limits) + 1;
+                                console.log(counts, lastpage );
+
+                                loadData(lastpage, limits);
                             } else {
                                 layer.msg('添加失败！');
                                 return false;
@@ -392,7 +432,6 @@
                     //    href: 'http://www.layui.com/'
                     //    , target: '_blank'
                     //});
-                    console.log(layero, index);
                 }
             });
         });

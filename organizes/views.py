@@ -8,8 +8,8 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, render_to_response, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View
-from .forms import DepaartmentForm, MemberForm, PersonalMac
-from .models import Member, Department, MacAddr
+from .forms import DepaartmentForm, MemberForm, PersonalMac, Login
+from .models import Member, Department, MacAddr, User
 
 
 # Create your views here.
@@ -76,7 +76,6 @@ class MemberView(View):
             phone = form.cleaned_data['phone']
             comment = form.cleaned_data['comment']
             depatid = form.cleaned_data['departid']
-            print(name, phone, comment, depatid)
             depart = Department.objects.filter(id=depatid).first()
             member = Member(name=name, phone=phone, depart=depart, comment=comment)
             member.save()
@@ -140,9 +139,14 @@ def dptpages(request):
 
 def delmember(request, mmb_id):
     # member_id = kwargs["mmb_id"] form = PersonalMac()
-    print('post data', mmb_id)
-    rspdata = {'code': 0, 'msg': "删除成功"}
-    return JsonResponse(rspdata)
+    print('[post data] :', mmb_id)
+    try:
+        member_obj = Member.objects.get(id=mmb_id)
+        member_obj.delete()
+        rspdata = {'code': 0, 'msg': "删除成功", "status": 800}
+        return JsonResponse(rspdata)
+    except ObjectDoesNotExist:
+        return JsonResponse({'code': 1, 'msg': "请求数据不存在！，请检查系统！", "status": 801})
 
 
 def updatemember(request, mmb_id):
@@ -165,8 +169,8 @@ def updatemember(request, mmb_id):
             member.phone = phone
             member.comment = comment
             member.save()
+            print('post data', name)
             return JsonResponse({'code': 0, 'msg': "修改成功"})
-    print('post data', mmb_id)
     rspdata = {'code': 0, 'msg': "删除成功"}
     return JsonResponse(rspdata)
 
@@ -192,12 +196,17 @@ def addmac(request, mmb_id):
 def login(requset):
     if requset.method == "POST":
         next_to = requset.POST.get('next', False)
-        if requset.POST.get['user'] == 'admin':
-            requset.user = 'admin'
+        loginForm = Login(requset,POST)
+        if loginForm.is_valid():
+            user = loginForm.cleaned_data['user']
+            passwd = loginForm.cleaned_data['password']
+            if auth.authenticate(user, passwd):
+                return render(requset, 'index.html')
+
         if requset.user:
             if next_to:
                 return redirect(next_to)
-            return render(requset, 'index.html')
+
         # user = request.POST.get("user")
         # pwd = request.POST.get("pwd")
         # # 使用authenticate（）方法

@@ -5,7 +5,7 @@
     <link rel="stylesheet" href="/static/layui/css/layui.css" type="text/css" />
 {% endblock %}
 {% block body %}
-        <form class="layui-form" action="/updatemember/{{ member }}" method="post" id="updateMemberForm">
+        <form class="layui-form" action="/updatemember/{{ member }}" method="post" id="updateMember" lay-filter="updateMember">
             {% csrf_token %}
             <div class="layui-form-item">
                 <label class="layui-form-label">{{ form.name.label }}</label>

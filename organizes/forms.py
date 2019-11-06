@@ -61,3 +61,8 @@ class PubMac(forms.Form):
     mactype = forms.ChoiceField(choices=MACTYPE_CHOICES, label='Mac类型')
     macaddr = forms.CharField(max_length=16, label='Mac地地址')
     comment = forms.CharField(widget=forms.Textarea, max_length=120, label='备注')
+
+
+class Login(forms.Form):
+    user =  forms.CharField(max_length=16, label='用户', required=True)
+    passwd = forms.CharField(widget=forms.PasswordInput, max_length=30, label='密码', required=True)
