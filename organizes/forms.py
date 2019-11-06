@@ -64,5 +64,5 @@ class PubMac(forms.Form):
 
 
 class Login(forms.Form):
-    user =  forms.CharField(max_length=16, label='用户', required=True)
+    name =  forms.CharField(max_length=16, label='用户', required=True)
     passwd = forms.CharField(widget=forms.PasswordInput, max_length=30, label='密码', required=True)

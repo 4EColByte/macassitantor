@@ -3,6 +3,7 @@ from django.core import serializers
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
 from django.contrib import auth
+from django.db.models import Q
 from django.forms.models import model_to_dict
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, render_to_response, redirect
@@ -105,7 +106,7 @@ class MacView(View):
         pass
 
 
-# @login_required
+@login_required
 def index(request):
     departs = []
     for depart_leve in (1, 2, 3):
@@ -193,28 +194,23 @@ def addmac(request, mmb_id):
     return render(request, 'mac_add.html', {'form': form})
 
 
-def login(requset):
-    if requset.method == "POST":
-        next_to = requset.POST.get('next', False)
-        loginForm = Login(requset,POST)
+def login(request):
+    if request.method == "POST":
+        next_to = request.POST.get('next', False)
+        loginForm = Login(request.POST)
         if loginForm.is_valid():
-            user = loginForm.cleaned_data['user']
-            passwd = loginForm.cleaned_data['password']
-            if auth.authenticate(user, passwd):
-                return render(requset, 'index.html')
-
-        if requset.user:
-            if next_to:
-                return redirect(next_to)
-
-        # user = request.POST.get("user")
-        # pwd = request.POST.get("pwd")
-        # # 使用authenticate（）方法
-        # auth.authenticate(username=user, password=pwd)
-        # if user is not None:  # 如果有这个用户,跳转到index页面
-        #     auth.login(request, user)
-        # return redirect("/index/")
-    return render(requset, 'login.html')
+            name = loginForm.cleaned_data['name']
+            passwd = loginForm.cleaned_data['passwd']
+            try:
+                user = User.objects.get(Q(username=name)|Q(email=name))
+                if user.check_password(passwd):
+                    auth.login(request, user)
+                    return redirect('/')
+            except ObjectDoesNotExist:
+                render(request, 'login.html')
+        elif next_to:
+            return redirect(next_to)
+    return render(request, 'login.html')
 
 
 def logout(request):
